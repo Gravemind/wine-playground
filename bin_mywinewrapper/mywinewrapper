@@ -1,0 +1,85 @@
+#!/bin/bash
+
+set -eu
+#set -x
+
+here="$(cd "$(dirname "$0")" ; pwd)"
+name="$(basename "$0")"
+
+parent="$(cd "$here/.." ; pwd)"
+srcdir="$parent/wine"
+topdir="$parent/build/wine64"
+
+# ln -s mywinewrapper msidb
+# ln -s mywinewrapper msiexec
+# ln -s mywinewrapper notepad
+# ln -s mywinewrapper regedit
+# ln -s mywinewrapper regsvr32
+# ln -s mywinewrapper wineboot
+# ln -s mywinewrapper winecfg
+# ln -s mywinewrapper wineconsole
+# ln -s mywinewrapper winedbg
+# ln -s mywinewrapper winefile
+# ln -s mywinewrapper winemine
+# ln -s mywinewrapper winepath
+# ln -s mywinewrapper wrc
+# ln -s mywinewrapper winebuild
+# ln -s mywinewrapper widl
+# ln -s mywinewrapper winedump
+# ln -s mywinewrapper winegcc
+# ln -s mywinewrapper wmc
+# ln -s mywinewrapper wine
+# ln -s mywinewrapper wine64
+# ln -s mywinewrapper wine64-preloader
+# ln -s mywinewrapper wineserver
+# ln -s mywinewrapper winemaker
+# ln -s mywinewrapper function_grep.pl
+# ln -s mywinewrapper winecpp
+# ln -s mywinewrapper wineg++
+
+# ln -s ../winetricks/src/winetricks
+
+case "$name" in
+    msidb|msiexec|notepad|regedit|regsvr32|wineboot|winecfg|wineconsole|winedbg|winefile|winemine|winepath)
+        exec "$topdir/wine" "$name" "$@"
+        echo "mywinewrapper: failed to execute $name: $here/mywinewrapper" 1>&2
+        exit 45
+        ;;
+    wine|wine64)
+        ## winewrapper needs "$0" to contain a "/" to try root dir from "$0"
+        exec "$topdir/$name" "$@"
+        echo "mywinewrapper: failed to execute $name: $topdir/$name" 1>&2
+        exit 46
+        ;;
+    winegcc|wineg++|winecpp)
+        bin="$topdir/tools/winegcc/winegcc"
+        ;;
+    wrc|winebuild|widl|winedump|wmc)
+        bin="$topdir/tools/$name/$name"
+        ;;
+    wine64-preloader)
+        bin="$topdir/loader/$name"
+        ;;
+    wineserver)
+        bin="$topdir/server/$name"
+        ;;
+    winemaker)
+        bin="$srcdir/tools/$name/$name"
+        ;;
+    function_grep.pl)
+        bin="$srcdir/tools/winedump/function_grep.pl"
+        ;;
+    *)
+        echo "mywinewrapper: error: could not find $name ($0)" 1>&2
+        exit 42
+esac
+
+if [[ -x "$bin" ]]
+then
+    exec -a "$name" "$bin" "$@"
+    echo "failed to execute $name: $bin" 1>&2
+    exit 47
+else
+    echo "mywinewrapper: error: $name no such executable: $bin" 1>&2
+    exit 43
+fi
