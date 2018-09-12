@@ -1,11 +1,11 @@
 #!/bin/bash
 
-wine_sandox_path="$(cd "$here/.." ; pwd)"
+wine_playground_path="$(cd "$here/.." ; pwd)"
 
 origin_cwd="$(pwd)"
 
 export ORIG_PATH="$PATH"
-export PATH="$ORIG_PATH:$wine_sandox_path/bin"
+export PATH="$ORIG_PATH:$wine_playground_path/bin"
 
 ## My steam library (will fallback if game not foud there)
 SteamLibrary="$HOME/SteamLibrary"
@@ -150,7 +150,7 @@ _setup_wine_prefix() {
     if [[ "$SetupDxvk" = 1 ]]
     then
         echo "---- Setup dxvk ----"
-        "$wine_sandox_path/setup_dxvk_to.sh"
+        "$wine_playground_path/setup_dxvk_to.sh"
     else
         echo "---- Skipping dxvk ----"
     fi
