@@ -1,0 +1,4 @@
+[submodule "wine"]
+	path = wine
+	url = https://github.com/Gravemind/wine
+	branch = my-wine-3.15-steam-staging
