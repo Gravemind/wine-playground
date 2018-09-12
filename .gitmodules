@@ -5,3 +5,7 @@
 [submodule "wine-staging"]
 	path = wine-staging
 	url = https://github.com/wine-staging/wine-staging.git
+[submodule "Proton"]
+	path = Proton
+	url = https://github.com/ValveSoftware/Proton.git
+	branch = proton_3.7
