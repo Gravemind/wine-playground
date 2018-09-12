@@ -12,3 +12,7 @@
 [submodule "dxvk"]
 	path = dxvk
 	url = https://github.com/doitsujin/dxvk.git
+[submodule "winetricks"]
+	path = winetricks
+	url = https://github.com/Winetricks/winetricks
+	branch = master
