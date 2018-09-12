@@ -9,3 +9,6 @@
 	path = Proton
 	url = https://github.com/ValveSoftware/Proton.git
 	branch = proton_3.7
+[submodule "dxvk"]
+	path = dxvk
+	url = https://github.com/doitsujin/dxvk.git
