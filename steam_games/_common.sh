@@ -85,7 +85,7 @@ $(printf -- "- ${WINEPREFIX/#$HOME/\~}/drive_c/users/$USER/%s\n" "${SymlinksToSt
 --------
 "
 
-    [[ -e "$WINEPREFIX" ]] || setup = 1
+    [[ -e "$WINEPREFIX" ]] || setup=1
 
     if [[ $setup = 1 ]]
     then
@@ -99,7 +99,7 @@ $(printf -- "- ${WINEPREFIX/#$HOME/\~}/drive_c/users/$USER/%s\n" "${SymlinksToSt
 
     echo "---- PREPARE ----"
     cd "$WINEPREFIX/drive_c"
-    ( prepare_wine_prefix )
+    prepare_wine_prefix
 
     if [[ "$#" -eq 0 ]]
     then
@@ -161,13 +161,12 @@ _setup_wine_prefix() {
         cd "$WINEPREFIX/drive_c/Program Files (x86)/Steam/"
         for dll in "$STEAM_COMPAT_CLIENT_INSTALL_PATH/legacycompat/"*.dll
         do
-            ln -fs "$dll"
+            ln -sf "$dll"
         done
     )
 
     ## Steam library as drive
-    rm -f "$WINEPREFIX/dosdevices/$SteamLibraryDrive"
-    ln -fs "$SteamLibrary" "$WINEPREFIX/dosdevices/$SteamLibraryDrive"
+    ln -sfT "$SteamLibrary" "$WINEPREFIX/dosdevices/$SteamLibraryDrive"
 
     ## Sym link saved game directories to steam official prefix
     for link in "${SymlinksToSteamPrefix[@]}"
@@ -191,7 +190,7 @@ _setup_wine_prefix() {
             fi
             rm -rf "$wine_dir"
         fi
-        ln -fs "$steam_dir" "$wine_dir"
+        ln -sfT "$steam_dir" "$wine_dir"
     done
 
     ## Regedit files
@@ -205,7 +204,15 @@ _setup_wine_prefix() {
 }
 
 _prepare_wine_prefix() {
-    true # nothing to do, for now
+
+    if [[ -z "${DXVK_CONFIG_FILE:-}" && -n "${DxvkConfig:-}" ]]
+    then
+        path="$WINEPREFIX/drive_c/generated_DxvkConfig.conf"
+        echo "---- Dxvk config: $path ----"
+        echo "$DxvkConfig" | tee "$path"
+        export DXVK_CONFIG_FILE="$path"
+    fi
+
 }
 
 wait_wineserver() {

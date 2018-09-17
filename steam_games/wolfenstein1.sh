@@ -16,6 +16,10 @@ MyRegistry='
 "Default"="1920x1200"
 '
 
+#WineDllOverrides+=("xaudio2_7=n,b")
+
+export WINEDEBUG=fps
+
 setup_wine_prefix()
 {
     ( _setup_wine_prefix )

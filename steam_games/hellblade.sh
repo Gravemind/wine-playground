@@ -17,6 +17,13 @@ WineDebug+=("-nvapi")
 #WineDebug+=("+dll,+module")
 #WineDebug+=("+xaudio2")
 
+DXVK_HUD="fps,frametimes"
+
+DxvkConfig='
+dxgi.maxFrameLatency = 1
+dxgi.syncInterval = 1
+'
+
 # Fixes audio crackling/fluttering/glitching
 # in combination with installing _CommonRedist sutff (_post_setup_wine_prefix)
 WineDllOverrides+=("xaudio2_7=n,b")
