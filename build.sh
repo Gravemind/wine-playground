@@ -147,7 +147,11 @@ build_dxvk() {
     log dxvk$arch configure
 
     cd "$here/dxvk"
-    meson --reconfigure --cross-file build-win$arch.txt --prefix "$builddir/dxvk$arch" "$builddir/build-dxvk$arch"
+
+    reconfigure=
+    [[ ! -e "$builddir/build-dxvk$arch/build.ninja" ]] || reconfigure="--reconfigure"
+
+    meson $reconfigure --cross-file build-win$arch.txt --prefix "$builddir/dxvk$arch" "$builddir/build-dxvk$arch"
 
     cd "$builddir/build-dxvk$arch"
     meson configure -Dbuildtype=release
