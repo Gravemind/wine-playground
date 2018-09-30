@@ -118,7 +118,8 @@ $(printf -- "- ${WINEPREFIX/#$HOME/\~}/drive_c/users/$USER/%s\n" "${SymlinksToSt
         then
             cd "$origin_cwd"
         else
-            cd "$WINEPREFIX/drive_c"
+            cd "$(dirname "$GamePath")"
+            #cd "$WINEPREFIX/drive_c"
         fi
         "$@"
         ret=$?

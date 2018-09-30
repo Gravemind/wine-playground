@@ -17,6 +17,7 @@ fi
 if [[ ! -e "$WINEPREFIX" ]]
 then
     echo "error: invalid WINEPREFIX: $WINEPREFIX"
+    exit 1
 fi
 
 export WINEARCH=win64
