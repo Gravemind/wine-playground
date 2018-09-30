@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#set -x
+
 wine_playground_path="$(cd "$here/.." ; pwd)"
 
 origin_cwd="$(pwd)"
@@ -103,17 +105,16 @@ $(printf -- "- ${WINEPREFIX/#$HOME/\~}/drive_c/users/$USER/%s\n" "${SymlinksToSt
 
     if [[ "$#" -eq 0 ]]
     then
-        echo "---- RUN wine $GamePath ----"
         if [[ "$keep_origin_cwd" = 1 ]]
         then
             cd "$origin_cwd"
         else
             cd "$(dirname "$GamePath")"
         fi
+        echo "---- RUN wine $GamePath ----"
         wine "$GamePath"
         ret=$?
     else
-        echo "---- RUN $@ ----"
         if [[ "$keep_origin_cwd" = 1 ]]
         then
             cd "$origin_cwd"
@@ -121,6 +122,7 @@ $(printf -- "- ${WINEPREFIX/#$HOME/\~}/drive_c/users/$USER/%s\n" "${SymlinksToSt
             cd "$(dirname "$GamePath")"
             #cd "$WINEPREFIX/drive_c"
         fi
+        echo "---- RUN $@ ----"
         "$@"
         ret=$?
     fi
@@ -194,17 +196,19 @@ _setup_wine_prefix() {
         ln -sfT "$steam_dir" "$wine_dir"
     done
 
-    ## Regedit files
-    regfile "$WINEPREFIX/../my_wine_regs.reg"
-    regfile "$WINEPREFIX/my_wine_regs.reg"
-
-    ## More regedit: custom
-    regmem "${MyRegistry:-}"
-
     wait_wineserver
 }
 
 _prepare_wine_prefix() {
+
+    ## Regedit files
+    autoreg "pfx..my_wine_regs.reg" "$WINEPREFIX/../my_wine_regs.reg"
+    autoreg "pfx_my_wine_regs.reg" "$WINEPREFIX/my_wine_regs.reg"
+
+    ## More regedit: custom
+    autoreg_data "var_MyRegistry" "${MyRegistry:-}"
+
+    wait_wineserver
 
     if [[ -z "${DXVK_CONFIG_FILE:-}" && -n "${DxvkConfig:-}" ]]
     then
@@ -216,38 +220,39 @@ _prepare_wine_prefix() {
 
 }
 
+autoreg() {
+    local name="$1"
+    local ext_file="$2"
+    [[ -e "$ext_file" ]] || return 0
+
+    local int_file="$WINEPREFIX/drive_c/autoreg_$name.reg"
+    if diff -q "$ext_file" "$int_file" >& /dev/null
+    then
+        echo "---- Registry $name up to date ----"
+        # SAME files
+        return 0
+    fi
+    echo "---- Registry update $name ----"
+    cat "$ext_file" > "$int_file"
+    wine reg import "$int_file"
+}
+
+autoreg_data()
+{
+    local name="$1"
+    local data="$2"
+    local tmp="$(mktemp -t steamautoreg.XXXXXXXX)"
+    (
+        echo -e 'Windows Registry Editor Version 5.00\n'
+        echo "$data"
+    ) > "$tmp"
+    autoreg "$name" "$tmp"
+    rm "$tmp"
+}
+
 wait_wineserver() {
     echo "Waiting for wineserver ..."
     wineserver -w
-}
-
-regmem() {
-    if [[ -n "$*" ]]
-    then
-        echo "---- Registry update ----"
-        echo "$@"
-        (
-            ( echo -e 'Windows Registry Editor Version 5.00\n' ; echo "$@" ) \
-                > "$WINEPREFIX/drive_c/tmp_regfile.reg"
-            cd "$WINEPREFIX/drive_c"
-            wine regedit "C:/tmp_regfile.reg"
-        )
-    fi
-}
-
-regfile() {
-    local file="$1"
-    if [[ -r "$file" ]]
-    then
-        echo "---- Registry update: $file ----"
-        (
-            \cat "$file" > "$WINEPREFIX/drive_c/tmp_regfile.reg"
-            cd "$WINEPREFIX/drive_c"
-            wine regedit "C:/tmp_regfile.reg"
-        )
-    else
-        echo "---- Skipping registry update: no such $file ----"
-    fi
 }
 
 array_join() {
