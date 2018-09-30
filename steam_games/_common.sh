@@ -122,6 +122,12 @@ $(printf -- "- ${WINEPREFIX/#$HOME/\~}/drive_c/users/$USER/%s\n" "${SymlinksToSt
             cd "$(dirname "$GamePath")"
             #cd "$WINEPREFIX/drive_c"
         fi
+        if ! pgrep -x steam >& /dev/null
+        then
+            echo
+            echo "----- /!\\ steam not running !? game might silently fail to launch /!\\ ----"
+            echo
+        fi
         echo "---- RUN $@ ----"
         "$@"
         ret=$?
