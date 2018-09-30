@@ -53,14 +53,31 @@ wine_install_dir="$builddir/wine"
 
 ####
 
-unset CC
-unset CXX
-unset CPP
+unsetcc() {
+    unset CC
+    unset CXX
+    unset CPP
+}
+unsetcc
 
-export CFLAGS="-O3 -march=native -g -fno-omit-frame-pointer"
-export CXXFLAGS="-O3 -march=native -g -fno-omit-frame-pointer"
-export MAKEFLAGS="-j6 -Orecurse"
-#export MAKEFLAGS="-Orecurse"
+# export CC="clang"
+# export CXX="clang++"
+# export LD="ld.lld"
+
+export CFLAGS="-O3 -march=native -g"
+export CXXFLAGS="-O3 -march=native -g"
+export MAKEFLAGS="-j$(nproc) -Orecurse"
+
+CFLAGS+=" -g3 -gdwarf-5 -fvar-tracking-assignments"
+CXXFLAGS+=" -g3 -gdwarf-5 -fvar-tracking-assignments"
+
+#CFLAGS+=" -fno-omit-frame-pointer"
+#CXXFLAGS+=" -fno-omit-frame-pointer"
+
+# CFLAGS+=" -flto"
+# CXXFLAGS+=" -flto"
+# LDFLAGS+=" -flto"
+# export LDFLAGS
 
 ####
 
@@ -73,7 +90,6 @@ export PATH="$ORIG_PATH:$here/bin"
 
 ####
 
-#winesrc="$here/wine-my-patched"
 winesrc="$here/wine"
 
 build_wine() {
@@ -124,15 +140,16 @@ fi
 ####
 
 build_dxvk() {
+    unsetcc
+
     local arch=$1
 
     log dxvk$arch configure
 
     cd "$here/dxvk"
-    meson --cross-file build-win$arch.txt --prefix "$builddir/dxvk$arch" "$builddir/build-dxvk$arch"
+    meson --reconfigure --cross-file build-win$arch.txt --prefix "$builddir/dxvk$arch" "$builddir/build-dxvk$arch"
 
     cd "$builddir/build-dxvk$arch"
-
     meson configure -Dbuildtype=release
 
     log dxvk$arch build
@@ -153,6 +170,8 @@ fi
 ####
 
 build_steamclient() {
+    # unsetcc
+
     local arch=$1
 
     log steamclient$arch configure
