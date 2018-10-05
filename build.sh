@@ -41,7 +41,7 @@ do
     esac
 done
 
-dobuild=",${1:-dxvk,wine,steamclient},"
+dobuild=",${1:-dxvk,wine,steamclient,faudio},"
 
 ####
 
@@ -68,8 +68,8 @@ export CFLAGS="-O3 -march=native -g"
 export CXXFLAGS="-O3 -march=native -g"
 export MAKEFLAGS="-j$(nproc) -Orecurse"
 
-CFLAGS+=" -g3 -gdwarf-5 -fvar-tracking-assignments"
-CXXFLAGS+=" -g3 -gdwarf-5 -fvar-tracking-assignments"
+#CFLAGS+=" -g3 -gdwarf-5 -fvar-tracking-assignments"
+#CXXFLAGS+=" -g3 -gdwarf-5 -fvar-tracking-assignments"
 
 #CFLAGS+=" -fno-omit-frame-pointer"
 #CXXFLAGS+=" -fno-omit-frame-pointer"
@@ -228,6 +228,45 @@ if [[ "$dobuild" == *,steamclient,* ]]
 then
     ( build_steamclient 32 )
     ( build_steamclient 64 )
+fi
+
+####
+
+build_faudio() {
+    # unsetcc
+
+    local arch=$1
+
+    cd "$here/FAudio"
+
+    log faudio$arch build FAudio
+
+    local old_path="$PATH"
+    . "cpp/scripts/cross_compile_$arch"
+
+    # If there was any *ccache* path, re-force it in front
+    if [[ ":$old_path:" =~ :([^:]+ccache[^:]+): ]]
+    then
+        local ccache_path="${BASH_REMATCH[1]}"
+        echo "Re-applying ccache PATH override: $ccache_path"
+        PATH="ccache_path:$PATH"
+        which $CC
+    fi
+
+    make clean
+    make all
+
+    log faudio$arch build xaudio
+    cd "cpp"
+    mkdir -p "build_win$arch" # avoid make clean error
+    make clean
+    make all
+}
+
+if [[ "$dobuild" == *,faudio,* ]]
+then
+    #( build_faudio 32 )
+    ( build_faudio 64 )
 fi
 
 log END

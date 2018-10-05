@@ -14,7 +14,9 @@ MyRegistry='
 "Default"="1920x1200"
 '
 
-WineDllOverrides+=("xaudio2_7=n,b")
+WineDllOverrides+=("xaudio2_7=n")
+
+#WineDebug+=("")
 
 #WineDebug+=("fps")
 export __GL_SHOW_GRAPHICS_OSD=1

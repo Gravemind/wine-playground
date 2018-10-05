@@ -12,13 +12,15 @@ with custom wineprefixes, custom and latest versions of wine, dxvk, etc...
   a few cherry-picked Steam Proton's hacks (to get steamclient working) + a
   couple of minor patches.
 
-- [dxvk](https://github.com/doitsujin/dxvk.git): latest dxvk
+- [dxvk](https://github.com/doitsujin/dxvk): latest dxvk
 
 - [Proton](https://github.com/ValveSoftware/Proton): Valve Software Steam Proton for `Proton/lsteamclient`
 
 - [wine-staging](https://github.com/wine-staging/wine-staging): wine staging patches
 
 - [winetricks](https://github.com/Winetricks/winetricks): wine tricks
+
+- [FAudio](https://github.com/FNA-XNA/FAudio): XAudio reimplementation
 
 ### Scripts:
 

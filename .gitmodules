@@ -16,3 +16,6 @@
 	path = winetricks
 	url = https://github.com/Winetricks/winetricks
 	branch = master
+[submodule "FAudio"]
+	path = FAudio
+	url = https://github.com/FNA-XNA/FAudio
