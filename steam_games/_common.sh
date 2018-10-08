@@ -17,6 +17,8 @@ SymlinksToSteamPrefix=( "Saved Games" "My Documents" )
 WineDebug=()
 WineDllOverrides=()
 
+opt_no_wineserver_wait=0
+
 main() {
     local setup=0
     local keep_origin_cwd=0
@@ -25,6 +27,7 @@ main() {
         case "$1" in
             --setup) setup=1 ; shift ;;
             --cwd) keep_origin_cwd=1 ; shift ;;
+            --no-wait) opt_no_wineserver_wait=1 ; shift ;;
             --) shift ; break ;;
             *) echo "$0: unkown arguement: $1" 1>&2 ; exit 2 ;;
         esac
@@ -257,6 +260,7 @@ autoreg_data()
 }
 
 wait_wineserver() {
+    [[ "$opt_no_wineserver_wait" = 0 ]] || return 0
     echo "Waiting for wineserver ..."
     wineserver -w
 }
@@ -280,5 +284,6 @@ run() {
 run_sync() {
     run "$@"
     echo "Waiting for $@ ..."
+    [[ "$opt_no_wineserver_wait" = 0 ]] || return 0
     wineserver -w
 }
