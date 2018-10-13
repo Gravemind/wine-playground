@@ -17,8 +17,7 @@ MyRegistry='
 '
 
 #WineDllOverrides+=("xaudio2_7=n,b")
-
-WineDebug+=("fps")
+#WineDebug+=("fps")
 
 setup_wine_prefix()
 {
