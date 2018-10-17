@@ -1,14 +1,23 @@
 #!/bin/bash
 
-#
-# usage:
-# $> ./lookup_perf_map.sh 140000000 ./perf.map
-#
-# Prints all lines of a `/tmp/perf-PID.map`-file style that contains/encapsulate
-# the given address.
-#
-
 set -euo pipefail
+
+usage() {
+    echo -n "$0: ADDRESS FILE
+
+example: $0 140000000 ./perf.map
+
+Prints all lines of a /tmp/perf-PID.map-file style FILE that
+contains/encapsulate the given ADDRESS.
+
+"
+}
+
+if [[ "${1:--h}" = "-h" || "${1:-}" = "--help" ]]
+then
+    usage
+    exit 0
+fi
 
 addr="$1"
 file="$2"

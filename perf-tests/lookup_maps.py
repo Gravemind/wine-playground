@@ -1,13 +1,5 @@
 #!/usr/bin/env python3
 
-#
-# usage:
-# $> ./lookup_maps.py 1405936f1 ./proc_maps
-#
-# Prints all lines of a `/proc/PID/maps`-style file that contains/encapsulate
-# the given address.
-#
-
 import sys
 import os.path
 import subprocess
@@ -16,11 +8,36 @@ import re
 import pprint
 pp = pprint.PrettyPrinter(indent=4).pprint
 
-def main(args):
-    look_addr = int(args[0], base=16)
-    maps_file = args[1]
+def usage():
+    u="""usage: {exe} [-h] ADDRESS FILE
 
-    with open(maps_file, 'r') as f:
+example: {exe} 1405936f1 ./proc_maps
+
+Prints all lines of a /proc/PID/maps-style FILE that contains/encapsulate the
+given ADDRESS (hex).
+
+""".format(exe=sys.argv[0])
+    print(u, end="")
+
+def main(args):
+
+    if len(args) > 0 and (args[0] == '-h' or args[0] == '--help'):
+        usage();
+        return 0
+
+    if len(args) != 2:
+        print("invalid argument", file=sys.stderr)
+        usage();
+        return 1
+
+    look_addr = int(args[0], base=16)
+
+    if args[1] != '-':
+        maps_file = open(args[1], 'r')
+    else:
+        maps_file = os.fdopen(sys.stdin.fileno(), 'r')
+
+    with maps_file as f:
         last_lines = []
         last_path = ""
         for line in f:

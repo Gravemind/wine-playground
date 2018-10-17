@@ -1,16 +1,5 @@
 #!/usr/bin/env python3
 
-#
-# usage:
-# $> cat /proc/PID/maps > proc_maps
-# $> ./exe_to_perf_map.py
-# $> cp perf.map /tmp/perf-PID.map
-# $> perf report ...
-#
-# Reads `proc_maps` and objdumps all .dll and .exe to output a 'perf report'
-# compatible `perf.map` file containing all mapped symbols
-#
-
 proc_maps_path = "proc_maps"
 output_perf_map = "perf.map"
 
@@ -21,6 +10,21 @@ import re
 
 import pprint
 pp = pprint.PrettyPrinter(indent=4).pprint
+
+def usage():
+    u="""usage: {exe} [-h] [INPUT [OUTPUT]]
+
+example: {exe} < /proc/PID/maps > /tmp/perf-PID.map
+
+Reads INPUT (stdin by default) expecting /proc/PID/maps style content, objdumps
+all .dll and .exe, and generates a perf.map style output (for perf report) to
+OUTPUT (stdout by default) containing all mapped symbols.
+
+""".format(exe=sys.argv[0])
+    print(u)
+
+def log(*args, **kargs):
+    print(*args, **kargs, file=sys.stderr)
 
 class Mapping:
     def __init__(self):
@@ -50,11 +54,11 @@ class Lib:
 
     def extract_symbols(self):
         prefix = os.path.basename(self.path)
-        print(prefix)
+        log(prefix)
 
-        print("  mappings:")
+        log("  mappings:")
         for mapping in self.mappings:
-            print("    {:x} - {:x}".format(mapping.start, mapping.end))
+            log("    {:x} - {:x}".format(mapping.start, mapping.end))
 
         self.syms = []
         self.image_ph = dict()
@@ -76,7 +80,7 @@ class Lib:
         self.image_code_offset = self.image_ph['BaseOfCode']
         self.image_size = self.image_ph['SizeOfImage']
 
-        print("  base: {:x}".format(self.image_base))
+        log("  base: {:x}".format(self.image_base))
 
         base = self.image_base + self.image_code_offset
 
@@ -110,7 +114,7 @@ class Lib:
             base = mapping.start + self.image_code_offset
 
             # if base + self.image_size > mapping.end:
-            #     print("{}: no space for mapping to {:x}-{:x}, need up to {:x}".format(prefix, mapping.start, mapping.end, base + self.image_size))
+            #     log("{}: no space for mapping to {:x}-{:x}, need up to {:x}".format(prefix, mapping.start, mapping.end, base + self.image_size))
             #     continue
 
             last_known = 0
@@ -140,9 +144,20 @@ def main(args):
 
     proc_libs_bypath = dict()
 
-    with open(proc_maps_path, 'rb') as f:
+    if len(args) > 0 and (args[0] == '-h' or args[0] == '--help'):
+        usage();
+        return 0
+
+    if len(args) > 1 and args[0] != '-':
+        maps_file = open(args[0], 'rb')
+    else:
+        maps_file = os.fdopen(sys.stdin.fileno(), 'rb')
+
+    with maps_file as f:
         lastmap = None
         content = str(f.read(), 'utf-8')
+        #content = f.read()
+        #log(content)
         for line in content.splitlines():
             spl = line.split(maxsplit=5)
             assert(len(spl) == 5 or len(spl) == 6)
@@ -162,11 +177,16 @@ def main(args):
         if not (path.endswith(".dll") or path.endswith(".exe")):
             continue
         if not os.path.exists(path):
-            print("Not such file: " + path)
+            log("Not such file: " + path)
 
         mp.extract_symbols()
 
-    with open(output_perf_map, 'w') as output:
+    if len(args) > 1 and args[1] != '-':
+        perf_file = open(args[1], 'w')
+    else:
+        perf_file = sys.stdout
+
+    with perf_file as output:
         for path, mp in proc_libs_bypath.items():
             if mp.syms is None:
                 continue
