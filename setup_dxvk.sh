@@ -1,10 +1,25 @@
 #!/bin/bash
 
 set -euo pipefail
-set -x
 
 here="$(cd "$(dirname "$0")"; pwd)"
 builddir="$here/build"
+
+usage() {
+    echo -n "usage: $0 [-h|--help] /path/to/wine/prefix
+
+  Runs dxvk's 32 and 64 setup_dxvk.sh scripts on /path/to/wine/prefix
+
+"
+}
+
+if [[ "${1:-}" = -h || "${1:-}" = --help ]]
+then
+    usage
+    exit 0
+fi
+
+set -x
 
 export PATH="$PATH:$here/bin"
 
@@ -14,7 +29,7 @@ then
     shift
 fi
 
-if [[ ! -e "$WINEPREFIX" ]]
+if [[ ! -e "$WINEPREFIX/drive_c" ]]
 then
     echo "error: invalid WINEPREFIX: $WINEPREFIX"
     exit 1

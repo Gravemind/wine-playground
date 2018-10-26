@@ -5,13 +5,29 @@ set -euo pipefail
 here="$(cd "$(dirname "$0")" ; pwd)"
 cd "$here"
 
+usage() {
+    echo -n "usage: $0 [-h|--help] /path/to/wine/prefix
+
+  Replace xaudio dlls to links to FAudio's.
+
+"
+}
+
+if [[ "${1:-}" = -h || "${1:-}" = --help ]]
+then
+    usage
+    exit 0
+fi
+
+# set -x
+
 if [[ -n "${1:-}" && -d "${1}" ]]
 then
     export WINEPREFIX="$(readlink -f "$1")"
     shift
 fi
 
-if [[ ! -e "$WINEPREFIX" ]]
+if [[ ! -e "$WINEPREFIX/drive_c" ]]
 then
     echo "error: invalid WINEPREFIX: $WINEPREFIX"
     exit 1
