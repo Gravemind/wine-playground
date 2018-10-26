@@ -18,4 +18,4 @@
 	branch = master
 [submodule "FAudio"]
 	path = FAudio
-	url = https://github.com/FNA-XNA/FAudio
+	url = https://github.com/Gravemind/FAudio

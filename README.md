@@ -8,9 +8,10 @@ with custom wineprefixes, custom and latest versions of wine, dxvk, etc...
 
 ### Submodules:
 
-- [wine fork](https://github.com/Gravemind/wine): wine + wine-staging patches +
-  a few cherry-picked Steam Proton's hacks (to get steamclient working) + a
-  couple of minor patches.
+- [wine](https://github.com/wine-mirror/wine)
+  [fork](https://github.com/Gravemind/wine): wine + wine-staging patches + a few
+  cherry-picked Steam Proton's hacks (to get steamclient working) + a couple of
+  minor patches.
 
 - [dxvk](https://github.com/doitsujin/dxvk): latest dxvk
 
@@ -20,7 +21,9 @@ with custom wineprefixes, custom and latest versions of wine, dxvk, etc...
 
 - [winetricks](https://github.com/Winetricks/winetricks): wine tricks
 
-- [FAudio](https://github.com/FNA-XNA/FAudio): XAudio reimplementation
+- [FAudio](https://github.com/FNA-XNA/FAudio)
+  [fork](https://github.com/Gravemind/FAudio): XAudio reimplementation, forked
+  to fix build error I got with my build.sh on Archlinux
 
 ### Scripts:
 
