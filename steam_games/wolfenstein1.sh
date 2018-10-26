@@ -13,7 +13,7 @@ MyRegistry='
 [HKEY_CURRENT_USER\Software\Wine\Explorer]
 "Desktop"="Default"
 [HKEY_CURRENT_USER\Software\Wine\Explorer\Desktops]
-"Default"="1920x1200"
+"Default"="'$ScreenRes'"
 '
 
 #WineDllOverrides+=("xaudio2_7=n,b")

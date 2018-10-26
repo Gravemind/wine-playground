@@ -14,6 +14,8 @@ SteamLibrary="$HOME/SteamLibrary"
 
 SymlinksToSteamPrefix=( "Saved Games" "My Documents" )
 
+ScreenRes="$(xdpyinfo | awk '/dimensions:/{ print $2; exit 0; }')"
+
 WineDebug=()
 WineDllOverrides=()
 
