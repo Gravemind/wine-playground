@@ -3,7 +3,7 @@
 set -euo pipefail
 
 here="$(cd "$(dirname "$0")" ; pwd)"
-cd "$here"
+faudio="$here/FAudio"
 
 usage() {
     echo -n "usage: $0 [-h|--help] /path/to/wine/prefix
@@ -32,8 +32,6 @@ then
     echo "error: invalid WINEPREFIX: $WINEPREFIX"
     exit 1
 fi
-
-faudio="$here/FAudio"
 
 wine_install_dest="$WINEPREFIX/drive_c/windows/system32"
 
