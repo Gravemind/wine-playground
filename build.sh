@@ -64,8 +64,8 @@ unsetcc
 # export CXX="clang++"
 # export LD="ld.lld"
 
-export CFLAGS="-O3 -march=native -g"
-export CXXFLAGS="-O3 -march=native -g"
+export CFLAGS="-O2 -march=native -g"
+export CXXFLAGS="-O2 -march=native -g"
 export MAKEFLAGS="-j$(nproc) -Orecurse"
 
 #CFLAGS+=" -g3 -gdwarf-5 -fvar-tracking-assignments"
