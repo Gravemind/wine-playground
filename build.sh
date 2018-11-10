@@ -14,8 +14,8 @@ exec >& >(tee -ia "$buildlogfile")
 exec 2>&1
 
 on_error() {
-  echo "Error near line ${1:-\?}: ${2:-error}; exit ${3:-1}"
-  exit "${3:-1}"
+    echo "Error near line ${1:-\?}: ${2:-error}; exit ${3:-1}"
+    exit "${3:-1}"
 }
 trap 'on_error ${LINENO}' ERR
 
@@ -58,15 +58,71 @@ unsetcc() {
     unset CXX
     unset CPP
 }
+
+path_set() {
+    local enable="$1"
+    local mypath="$2"
+    [[ -n "$mypath" ]] || return 0
+    export PATH="${PATH//$mypath://}"
+    if [[ "$enable" = "1" ]]
+    then
+        export PATH="${mypath}:$PATH"
+        log "Added to PATH: $mypath"
+    else
+        log "Removed from PATH: $mypath"
+    fi
+}
+
+# One way to use ccache everywhere is to use symlinks and PATH override, eg:
+#   $> mkdir ~/bin/ccache_bin
+#   $> ln -s /usr/bin/ccache ~/bin/ccache_bin/gcc
+#   $> ln -s /usr/bin/ccache ~/bin/ccache_bin/g++
+#   $> ln -s /usr/bin/ccache ~/bin/ccache_bin/x86_64-w64-mingw32-gcc
+#   $> ln -s /usr/bin/ccache ~/bin/ccache_bin/x86_64-w64-mingw32-g++
+#   etc...
+#   $> export PATH="$HOME/bin/ccache_bin:$PATH"
+if [[ -e "$HOME/bin/ccache_bin/gcc" ]]
+then
+    log "ccache ready to be enabled"
+    ccacheon() { path_set 1 "$HOME/bin/ccache_bin"; }
+    ccacheoff() { path_set 0 "$HOME/bin/ccache_bin"; }
+else
+    log "ccache not found"
+    ccacheon() { true; }
+    ccacheoff() { true; }
+fi
+
+# Same as above for rtags, with:
+#   $> ln -s /path/to/rtags/bin/gcc-rtags-wrapper.sh ~/bin/rtags_bin/gcc
+#   etc...
+if [[ -e "$HOME/bin/rtags_bin/gcc" ]] && rc --project > /dev/null 2>&1
+then
+    log "rtags ready to be enabled"
+    rtagson() { path_set 1 "$HOME/bin/rtags_bin"; }
+    rtagsoff() { path_set 0 "$HOME/bin/rtags_bin"; }
+else
+    log "rtags not found or not running"
+    rtagson() { true; }
+    rtagsoff() { true; }
+fi
+
 unsetcc
+
+ccacheon
 
 # export CC="clang"
 # export CXX="clang++"
 # export LD="ld.lld"
 
-export CFLAGS="-O2 -march=native -g"
-export CXXFLAGS="-O2 -march=native -g"
-export MAKEFLAGS="-j$(nproc) -Orecurse"
+#export CFLAGS="-O2 -march=native -g"
+#export CXXFLAGS="-O2 -march=native -g"
+export CFLAGS="-O3 -march=native -g"
+export CXXFLAGS="-O3 -march=native -g"
+# export CFLAGS="-g -Og -mmmx -msse -msse2 -mfpmath=sse"
+# export CXXFLAGS="-g -Og -mmmx -msse -msse2 -mfpmath=sse"
+export MAKEFLAGS="-j$(( 1 + $(nproc) * 9 / 10 ))  -Orecurse"
+
+CFLAGS+=" -fwrapv -fno-strict-aliasing"
 
 #CFLAGS+=" -g3 -gdwarf-5 -fvar-tracking-assignments"
 #CXXFLAGS+=" -g3 -gdwarf-5 -fvar-tracking-assignments"
@@ -81,12 +137,7 @@ export MAKEFLAGS="-j$(nproc) -Orecurse"
 
 ####
 
-ORIG_PATH="$PATH"
-#export PATH="$ORIG_PATH:$wine_install_dir/bin"
-export PATH="$ORIG_PATH:$here/bin"
-
-#which -a winegcc
-#exit 1
+path_set 1 "$here/bin"
 
 ####
 
@@ -118,7 +169,9 @@ build_wine() {
 
     log wine$arch build
 
+    [[ $arch != 64 ]] || rtagson
     make
+    rtagsoff
 
     if [[ "$install_wine" != 0 ]]
     then
@@ -151,10 +204,9 @@ build_dxvk() {
     reconfigure=
     [[ ! -e "$builddir/build-dxvk$arch/build.ninja" ]] || reconfigure="--reconfigure"
 
-    meson $reconfigure --cross-file build-win$arch.txt --prefix "$builddir/dxvk$arch" "$builddir/build-dxvk$arch"
+    meson $reconfigure --cross-file build-win$arch.txt --buildtype release --prefix "$builddir/dxvk$arch" "$builddir/build-dxvk$arch"
 
     cd "$builddir/build-dxvk$arch"
-    meson configure -Dbuildtype=release
 
     log dxvk$arch build
 
