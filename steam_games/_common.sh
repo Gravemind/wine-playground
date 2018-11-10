@@ -24,12 +24,14 @@ opt_no_wineserver_wait=0
 main() {
     local setup=0
     local keep_origin_cwd=0
+    local start_wait=0
     while [[ "${1:-}" = --* ]]
     do
         case "$1" in
             --setup) setup=1 ; shift ;;
             --cwd) keep_origin_cwd=1 ; shift ;;
             --no-wait) opt_no_wineserver_wait=1 ; shift ;;
+            --start-wait) start_wait=1 ; shift ;;
             --) shift ; break ;;
             *) echo "$0: unkown arguement: $1" 1>&2 ; exit 2 ;;
         esac
@@ -109,6 +111,8 @@ $(printf -- "- ${WINEPREFIX/#$HOME/\~}/drive_c/users/$USER/%s\n" "${SymlinksToSt
     echo "---- PREPARE ----"
     cd "$WINEPREFIX/drive_c"
     prepare_wine_prefix
+
+    [[ "$start_wait" -eq 0 ]] || wait_wineserver -f
 
     if [[ "$#" -eq 0 ]]
     then
@@ -264,7 +268,10 @@ autoreg_data()
 }
 
 wait_wineserver() {
-    [[ "$opt_no_wineserver_wait" = 0 ]] || return 0
+    if [[ "$opt_no_wineserver_wait" != 0 && "${1:-}" != "-f" ]]
+    then
+        return 0
+    fi
     echo "Waiting for wineserver ..."
     wineserver -w
 }
