@@ -166,7 +166,7 @@ _setup_wine_prefix() {
     if [[ "$SetupDxvk" = 1 ]]
     then
         echo "---- Setup dxvk ----"
-        "$wine_playground_path/setup_dxvk_to.sh"
+        "$wine_playground_path/setup_dxvk.sh"
     else
         echo "---- Skipping dxvk ----"
     fi
