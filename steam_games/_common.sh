@@ -45,6 +45,8 @@ main() {
     [[ -z "${WINEDLLOVERRIDES:-}" ]] || WineDllOverrides+=( "$WINEDLLOVERRIDES" )
     export WINEDLLOVERRIDES="$(array_join ";" "${WineDllOverrides[@]}")"
 
+    export WINE_LSTEAMCLIENT=1
+
     ## dxvk
     export DXVK_HUD="${DXVK_HUD:-fps}"
 
