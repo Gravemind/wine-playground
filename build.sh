@@ -120,7 +120,8 @@ export CFLAGS="-O3 -march=native -g"
 export CXXFLAGS="-O3 -march=native -g"
 # export CFLAGS="-g -Og -mmmx -msse -msse2 -mfpmath=sse"
 # export CXXFLAGS="-g -Og -mmmx -msse -msse2 -mfpmath=sse"
-export MAKEFLAGS="-j$(( 1 + $(nproc) * 9 / 10 ))  -Orecurse"
+nproc="$(( $(nproc) * 9 / 10 ))"
+export MAKEFLAGS="-j$nproc  -Orecurse"
 
 CFLAGS+=" -fwrapv -fno-strict-aliasing"
 
@@ -210,7 +211,7 @@ build_dxvk() {
 
     log dxvk$arch build
 
-    ninja
+    ninja -j$nproc
 
     log dxvk$arch install
 
