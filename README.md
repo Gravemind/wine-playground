@@ -10,8 +10,8 @@ with custom wineprefixes, custom and latest versions of wine, dxvk, etc...
 
 - [wine](https://github.com/wine-mirror/wine)
   [fork](https://github.com/Gravemind/wine): wine + wine-staging patches + a few
-  cherry-picked Steam Proton's hacks (to get steamclient working) + a couple of
-  minor patches.
+  [cherry-picked Steam Proton's hacks](./wine-proton-patches.md) (to get steamclient
+  working) + a couple of minor patches.
 
 - [dxvk](https://github.com/doitsujin/dxvk): latest dxvk
 
