@@ -3,7 +3,7 @@
 set -euo pipefail
 
 here="$(cd "$(dirname "$0")" ; pwd)"
-faudio="$here/FAudio"
+builddir="$here/build"
 
 usage() {
     echo -n "usage: $0 [-h|--help] /path/to/wine/prefix
@@ -56,12 +56,12 @@ ln_install() {
     ln -sfT "$src" "$dst"
 }
 
-for dll in "$faudio/cpp/build_win64/"*.dll
+for dll in "$builddir/faudio64/bin/"*.dll
 do
     ln_install "$dll"
 done
 
-libwinpthread="$(echo /usr/x86_64-w64-mingw32/**/libwinpthread-1.dll)"
-[[ -e "$libwinpthread" ]] || { echo "error: libwinpthread-1.dll not found, expected $libwinpthread" ; exit 1; }
-echo "linking $wine_install_dest/libwinpthread-1.dll -> $libwinpthread"
-ln -sfT  "$libwinpthread" "$wine_install_dest/libwinpthread-1.dll"
+# libwinpthread="$(echo /usr/x86_64-w64-mingw32/**/libwinpthread-1.dll)"
+# [[ -e "$libwinpthread" ]] || { echo "error: libwinpthread-1.dll not found, expected $libwinpthread" ; exit 1; }
+# echo "linking $wine_install_dest/libwinpthread-1.dll -> $libwinpthread"
+# ln -sfT  "$libwinpthread" "$wine_install_dest/libwinpthread-1.dll"

@@ -292,28 +292,18 @@ build_faudio() {
 
     cd "$here/FAudio"
 
-    log faudio$arch build FAudio
+    log faudio$arch mingw cmake FAudio
 
-    local old_path="$PATH"
-    . "cpp/scripts/cross_compile_$arch"
+    # rm -rf "_build_mingw"
+    # rm -rf "_install_mingw"
 
-    # If there was any *ccache* path, re-force it in front
-    if [[ ":$old_path:" =~ :([^:]+ccache[^:]+): ]]
-    then
-        local ccache_path="${BASH_REMATCH[1]}"
-        echo "Re-applying ccache PATH override: $ccache_path"
-        PATH="ccache_path:$PATH"
-        which $CC
-    fi
+    x86_64-w64-mingw32-cmake -H. -B"$builddir/build-faudio$arch" -DCMAKE_INSTALL_PREFIX="$builddir/faudio$arch" -DBUILD_CPP=ON -DINSTALL_MINGW_DEPENDENCIES=ON
 
-    make clean
-    make all
+    log faudio$arch cmake and build FAudio
 
-    log faudio$arch build xaudio
-    cd "cpp"
-    mkdir -p "build_win$arch" # avoid make clean error
-    make clean
-    make all
+    #[[ $arch != 64 ]] || rtagson
+    cmake --build "$builddir/build-faudio$arch" --target install -- -j$nproc
+    #rtagsoff
 }
 
 if [[ "$dobuild" == *,faudio,* ]]
