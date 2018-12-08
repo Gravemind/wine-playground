@@ -35,8 +35,10 @@ then
     exit 1
 fi
 
+def_cmd=(install)
+
 export WINEARCH=win64
 cd "$builddir/dxvk32/bin"
-bash ./setup_dxvk.sh "$@"
+bash ./setup_dxvk.sh "${@:-${def_cmd[@]}}"
 cd "$builddir/dxvk64/bin"
-bash ./setup_dxvk.sh "$@"
+bash ./setup_dxvk.sh "${@:-${def_cmd[@]}}"
