@@ -268,13 +268,11 @@ build_steamclient() {
 
     targetdir="$builddir/wine$arch/dlls/lsteamclient"
     mkdir -p "$targetdir"
-    rm -rf "$targetdir/lsteamclient.dll.so"
-    ln -s "$dll" "$targetdir/lsteamclient.dll.so"
+    ln -sfT "$dll" "$targetdir/lsteamclient.dll.so"
 
     targetdir="$wine_install_dir/$lib/wine"
     mkdir -p "$targetdir"
-    rm -rf "$targetdir/lsteamclient.dll.so"
-    ln -s "$dll" "$targetdir/lsteamclient.dll.so"
+    ln -sfT "$dll" "$targetdir/lsteamclient.dll.so"
 }
 
 if [[ "$dobuild" == *,steamclient,* ]]
@@ -297,7 +295,11 @@ build_faudio() {
     # rm -rf "_build_mingw"
     # rm -rf "_install_mingw"
 
-    x86_64-w64-mingw32-cmake -H. -B"$builddir/build-faudio$arch" -DCMAKE_INSTALL_PREFIX="$builddir/faudio$arch" -DBUILD_CPP=ON -DINSTALL_MINGW_DEPENDENCIES=ON
+    x86_64-w64-mingw32-cmake -H. -B"$builddir/build-faudio$arch" \
+          -DCMAKE_INSTALL_PREFIX="$builddir/faudio$arch" \
+          -DBUILD_CPP=ON \
+          -DINSTALL_MINGW_DEPENDENCIES=ON \
+          -DCMAKE_BUILD_TYPE=Release -DFORCE_ENABLE_DEBUGCONFIGURATION=ON -DLOG_ASSERTIONS=ON
 
     log faudio$arch cmake and build FAudio
 
